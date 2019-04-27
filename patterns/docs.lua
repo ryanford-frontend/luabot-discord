@@ -29,7 +29,7 @@ local docs = Ct(mention ^ 0) * command * Ct(query)
 
 patterns.docs = Ct(P {
     'message',
-    message = (Ct(docs) + V'not_docs') ^ 1 * -1,
+    message = ((V'not_docs' * space * Ct(docs)) + Ct(docs) + (V'not_docs' * (-docs))) ^ 1 * -1,
     not_docs = opt_space * (1 - docs) ^ 1,
  })
 
