@@ -1,5 +1,5 @@
 local unpack = table.unpack
-local docs = require('patterns.docs').docs
+local docs = require('../docs').docs
 local inspect = require('inspect')
 
 describe('Discord Luabot', function()
