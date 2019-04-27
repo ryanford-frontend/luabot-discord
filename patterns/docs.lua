@@ -3,6 +3,7 @@ local lpeg = require('lpeg')
 local patterns = {}
 
 local C = lpeg.C
+local Cc = lpeg.Cc
 local Ct = lpeg.Ct
 local P = lpeg.P
 local R = lpeg.R
