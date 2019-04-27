@@ -107,7 +107,7 @@ describe('Discord Luabot', function()
          local matches = docs:match(str)
          print(inspect(matches))
 
-         assert.are.same(#matches, 0)
+         assert.is.falsy(matches)
       end)
 
       it('should work with multiple matches', function()
