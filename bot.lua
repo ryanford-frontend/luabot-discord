@@ -5,7 +5,7 @@ local TOKEN = config.token
 local concat = table.concat
 local sf = string.format
 local unpack = table.unpack
-local docs = require('patterns.docs')
+local docs = require('patterns.docs').docs
 
 client:on('ready', function()
    print('Logged in as '.. client.user.username)
