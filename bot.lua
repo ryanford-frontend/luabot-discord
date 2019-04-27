@@ -2,6 +2,7 @@ local discordia = require('discordia')
 local client = discordia.Client()
 local config = require('config')
 local TOKEN = config.token
+local urlencode = require('querystring').urlencode
 local concat = table.concat
 local sf = string.format
 local unpack = table.unpack
@@ -23,7 +24,7 @@ client:on('messageCreate', function(message)
    
    for _, match in ipairs(matches) do
       local mentions, queries = unpack(match)
-      for i,v in ipairs(queries) do queries[i] = v ~= '' and v or nil end
+      for i,v in ipairs(queries) do queries[i] = v ~= '' and urlencode(v) or nil end
       local response = sf(
          '%s <https://devdocs.io/%s>',
          concat(mentions, ' '),
