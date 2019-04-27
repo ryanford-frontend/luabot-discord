@@ -105,7 +105,6 @@ describe('Discord Luabot', function()
       it('should not match with malformed queries', function()
          local str = 'hey <@1234512345>!docs lua patterns'
          local matches = docs:match(str)
-         print(inspect(matches))
 
          assert.is.falsy(matches)
       end)
@@ -131,6 +130,36 @@ describe('Discord Luabot', function()
             local query, subquery = unpack(queries)
 
             assert.are.same(#matches, 2)
+            assert.is.same(#mentions, 1)
+            assert.is.same(mentions[1], meta[i].mention)
+            assert.are.same(query, meta[i].query)
+            assert.are.same(subquery, meta[i].subquery)
+         end
+      end)
+
+      it('should work with multiple matches and ignore malformed calls', function()
+         local str = 'hey <@1234512345> !docs lua patterns and <@678910678910> !docs js; askjdhaksjhd!docs php lua'
+         local matches = docs:match(str)
+         local meta = {
+            {
+               mention = '<@1234512345>',
+               query = 'lua',
+               subquery = 'patterns',
+            },
+            {
+               mention = '<@678910678910>',
+               query = 'js',
+               subquery = '',
+            },
+         }
+         print(inspect(matches))
+         assert.is.truthy(matches)
+         assert.are.same(#matches, 2)
+
+         for i, match in ipairs(matches) do
+            local mentions, queries = unpack(match)
+            local query, subquery = unpack(queries)
+
             assert.is.same(#mentions, 1)
             assert.is.same(mentions[1], meta[i].mention)
             assert.are.same(query, meta[i].query)
