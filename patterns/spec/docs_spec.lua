@@ -4,91 +4,82 @@ local inspect = require('inspect')
 
 describe('Discord Luabot', function()
    describe('LPEG Patterns', function()
-      it('can be the first text in a message', function()
+      it('can be the only text in a message', function()
          local str = '!docs'
          local matches = docs:match(str)
          local match = matches[1]
          local mentions, queries = unpack(match)
          local query, subquery = unpack(queries)
 
+         assert.is.table(matches)
+         assert.are.same(#matches, 1)
+         assert.is.table(match)
+         assert.is.table(mentions)
+         assert.is.same(#mentions, 0)
+         assert.is.table(queries)
+         assert.are.same(query, '')
+         assert.are.same(subquery, '')
+      end)
+
+      it('can have 1 query', function()
+         local str = '!docs lua'
+         local matches = docs:match(str)
+         local match = matches[1]
+         local mentions, queries = unpack(match)
+         local query, subquery = unpack(queries)
+
          assert.are.same(#matches, 1)
          assert.is.same(#mentions, 0)
-         assert.are.same(query, '')
-         assert.are.same(subquery, '')
-      end)
-
-      it('should match calls with 0 queries', function()
-         local str = 'hey <@1234512345> !docs'
-         local matches = docs:match(str)
-         local match = matches[1]
-         local mentions, queries = unpack(match)
-         local query, subquery = unpack(queries)
-
-         assert.are.same(#matches, 1)
-         assert.is.same(#mentions, 1)
-         assert.is.same(mentions[1], '<@1234512345>')
-         assert.are.same(query, '')
-         assert.are.same(subquery, '')
-      end)
-
-      it('should capture calls with 1 query', function()
-         local str = 'hey <@1234512345> !docs lua'
-         local matches = docs:match(str)
-         local match = matches[1]
-         local mentions, queries = unpack(match)
-         local query, subquery = unpack(queries)
-
-         assert.are.same(#matches, 1)
-         assert.is.same(#mentions, 1)
-         assert.is.same(mentions[1], '<@1234512345>')
+         assert.is.falsy(mentions[1])
          assert.are.same(query, 'lua')
          assert.are.same(subquery, '')
       end)
 
-      it('should capture calls with 2 queries', function()
-         local str = 'hey <@1234512345> !docs lua patterns'
+      it('can have 2 queries', function()
+         local str = '!docs lua patterns'
          local matches = docs:match(str)
          local match = matches[1]
          local mentions, queries = unpack(match)
          local query, subquery = unpack(queries)
 
          assert.are.same(#matches, 1)
-         assert.is.same(#mentions, 1)
-         assert.is.same(mentions[1], '<@1234512345>')
+         assert.is.same(#mentions, 0)
+         assert.is.falsy(mentions[1])
          assert.are.same(query, 'lua')
          assert.are.same(subquery, 'patterns')
       end)
 
-      it('should only capture 2 queries', function()
-         local str = 'hey <@1234512345> !docs lua patterns captures'
+      it("won't capture more than 2 queries", function()
+         local str = '!docs lua patterns captures'
          local matches = docs:match(str)
          local match = matches[1]
          local mentions, queries = unpack(match)
          local query, subquery, throw_away = unpack(queries)
 
-         assert.is.same(#mentions, 1)
-         assert.is.same(mentions[1], '<@1234512345>')
+         assert.is.same(#mentions, 0)
+         assert.is.falsy(mentions[1])
          assert.is.same(#queries, 2)
          assert.are.same(query, 'lua')
          assert.are.same(subquery, 'patterns')
          assert.is.falsy(throw_away)
       end)
 
-      it('should work with no mentions', function()
-         local str = 'hey !docs lua patterns'
+      it('can have a mention', function()
+         local str = '<@1234512345> !docs'
          local matches = docs:match(str)
          local match = matches[1]
          local mentions, queries = unpack(match)
          local query, subquery = unpack(queries)
 
          assert.are.same(#matches, 1)
-         assert.is.same(#mentions, 0)
-         assert.are.same(query, 'lua')
-         assert.are.same(subquery, 'patterns')
+         assert.is.same(#mentions, 1)
+         assert.is.same(mentions[1], '<@1234512345>')
+         assert.are.same(query, '')
+         assert.are.same(subquery, '')
       end)
 
-      it('should work with multiple mentions', function()
-         local str = 'hey <@1234512345> <@678910678910> !docs lua patterns'
+      it('can have multiple mentions', function()
+         local str = '<@1234512345> <@678910678910> !docs'
          local matches = docs:match(str)
          local match = matches[1]
          local mentions, queries = unpack(match)
@@ -98,73 +89,172 @@ describe('Discord Luabot', function()
          assert.is.same(#mentions, 2)
          assert.is.same(mentions[1], '<@1234512345>')
          assert.is.same(mentions[2], '<@678910678910>')
-         assert.are.same(query, 'lua')
-         assert.are.same(subquery, 'patterns')
+         assert.are.same(query, '')
+         assert.are.same(subquery, '')
       end)
 
-      it('should not match with malformed queries', function()
+      it('requires space between mentions and the commmand', function()
          local str = 'hey <@1234512345>!docs lua patterns'
          local matches = docs:match(str)
 
-         assert.is.falsy(matches)
+         assert.are.same(#matches, 0)
       end)
 
-      it('should work with multiple matches', function()
-         local str = 'hey <@1234512345> !docs lua patterns and <@678910678910> !docs js'
+      it('can have multiple matches', function()
+         local str = '<@1234512345> !docs lua patterns and <@678910678910> !docs js'
          local matches = docs:match(str)
-         local meta = {
-            {
-               mention = '<@1234512345>',
-               query = 'lua',
-               subquery = 'patterns',
-            },
-            {
-               mention = '<@678910678910>',
-               query = 'js',
-               subquery = '',
-            },
-         }
+         local match1, match2 = unpack(matches)
 
-         for i, match in ipairs(matches) do
-            local mentions, queries = unpack(match)
-            local query, subquery = unpack(queries)
-
-            assert.are.same(#matches, 2)
-            assert.is.same(#mentions, 1)
-            assert.is.same(mentions[1], meta[i].mention)
-            assert.are.same(query, meta[i].query)
-            assert.are.same(subquery, meta[i].subquery)
-         end
-      end)
-
-      it('should work with multiple matches and ignore malformed calls', function()
-         local str = 'hey <@1234512345> !docs lua patterns and <@678910678910> !docs js; askjdhaksjhd!docs php lua'
-         local matches = docs:match(str)
-         local meta = {
-            {
-               mention = '<@1234512345>',
-               query = 'lua',
-               subquery = 'patterns',
-            },
-            {
-               mention = '<@678910678910>',
-               query = 'js',
-               subquery = '',
-            },
-         }
-         print(inspect(matches))
-         assert.is.truthy(matches)
          assert.are.same(#matches, 2)
+         -- first match
+         local mentions, queries = unpack(match1)
+         local query, subquery = unpack(queries)
 
-         for i, match in ipairs(matches) do
-            local mentions, queries = unpack(match)
-            local query, subquery = unpack(queries)
+         assert.is.same(#mentions, 1)
+         assert.is.same(mentions[1], '<@1234512345>')
+         assert.are.same(query, 'lua')
+         assert.are.same(subquery, 'patterns')
+         -- second match
+         mentions, queries = unpack(match2)
+         query, subquery = unpack(queries)
 
-            assert.is.same(#mentions, 1)
-            assert.is.same(mentions[1], meta[i].mention)
-            assert.are.same(query, meta[i].query)
-            assert.are.same(subquery, meta[i].subquery)
-         end
+         assert.is.same(#mentions, 1)
+         assert.is.same(mentions[1], '<@678910678910>')
+         assert.are.same(query, 'js')
+         assert.are.same(subquery, '')
+      end)
+
+      it('works with multiple matches and ignores malformed calls', function()
+         local str = 'hey <@1234512345> !docs lua patterns and <@678910678910> !docs js regexp askjdhaksjhd!docs php lua'
+         local matches = docs:match(str)
+         local match1, match2, match3 = unpack(matches)
+
+         assert.is.table(matches)
+         assert.are.same(#matches, 2)
+         -- first match
+         local mentions, queries = unpack(match1)
+         local query, subquery = unpack(queries)
+
+         assert.is.table(match1)
+         assert.is.same(#mentions, 1)
+         assert.is.same(mentions[1], '<@1234512345>')
+         assert.are.same(query, 'lua')
+         assert.are.same(subquery, 'patterns')
+         -- second match
+         mentions, queries = unpack(match2)
+         query, subquery = unpack(queries)
+
+         assert.is.table(match2)
+         assert.is.same(#mentions, 1)
+         assert.is.same(mentions[1], '<@678910678910>')
+         assert.are.same(query, 'js')
+         assert.are.same(subquery, 'regexp')
+         -- no third match
+         assert.is.falsy(match3)
+      end)
+
+      it('can be can be preceded by unrelated text in a message', function()
+         local str = 'hi !docs'
+         local matches = docs:match(str)
+         local match = matches[1]
+         local mentions, queries = unpack(match)
+         local query, subquery = unpack(queries)
+
+         assert.is.table(matches)
+         assert.are.same(#matches, 1)
+         assert.is.table(match)
+         assert.is.table(mentions)
+         assert.is.same(#mentions, 0)
+         assert.is.table(queries)
+         assert.are.same(query, '')
+         assert.are.same(subquery, '')
+      end)
+
+      it('can be delimited with a semicolon', function()
+         local str1 = '!docs; hello world'
+         local str2 = '!docs hello; world'
+         local str3 = '!docs hello world;'
+
+         -- example 1
+         local matches = docs:match(str1)
+         local match = matches[1]
+         local mentions, queries = unpack(match)
+         local query, subquery = unpack(queries)
+
+         assert.is.table(matches)
+         assert.are.same(#matches, 1)
+         assert.is.table(match)
+         assert.is.table(mentions)
+         assert.is.same(#mentions, 0)
+         assert.is.table(queries)
+         assert.are.same(query, '')
+         assert.are.same(subquery, '')
+
+         matches = docs:match(str2)
+         match = matches[1]
+         mentions, queries = unpack(match)
+         query, subquery = unpack(queries)
+
+         assert.is.table(matches)
+         assert.are.same(#matches, 1)
+         assert.is.table(match)
+         assert.is.table(mentions)
+         assert.is.same(#mentions, 0)
+         assert.is.table(queries)
+         assert.are.same(query, 'hello')
+         assert.are.same(subquery, '')
+
+         matches = docs:match(str3)
+         match = matches[1]
+         mentions, queries = unpack(match)
+         query, subquery = unpack(queries)
+
+         assert.is.table(matches)
+         assert.are.same(#matches, 1)
+         assert.is.table(match)
+         assert.is.table(mentions)
+         assert.is.same(#mentions, 0)
+         assert.is.table(queries)
+         assert.are.same(query, 'hello')
+         assert.are.same(subquery, 'world')
+      end)
+
+      it('requires space between unrelated text and command', function()
+         local str = 'hello!docs lua patterns captures'
+         local matches = docs:match(str)
+         local match = matches[1]
+
+         assert.is.table(matches)
+         assert.is.same(#matches, 0)
+         assert.is.falsy(match)
+      end)
+
+      it('requires space between command and query', function()
+         local str = '!docslua patterns captures'
+         local matches = docs:match(str)
+         local match = matches[1]
+
+         assert.is.table(matches)
+         assert.is.same(#matches, 0)
+         assert.is.falsy(match)
+      end)
+
+      it('ignores command in a codeblock', function()
+         local str = '`hello world !docs lua patterns captures`'
+         local matches = docs:match(str)
+         local match = matches[1]
+
+         assert.is.table(matches)
+         assert.is.same(#matches, 0)
+         assert.is.falsy(match)
+
+         str = '```\nhello world !docs lua patterns captures\n```'
+         matches = docs:match(str)
+         match = matches[1]
+
+         assert.is.table(matches)
+         assert.is.same(#matches, 0)
+         assert.is.falsy(match)
       end)
    end)
 end)
