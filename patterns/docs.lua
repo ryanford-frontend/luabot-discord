@@ -18,14 +18,12 @@ local mention = P {
    mention = (((1 - V'user') ^ 0 * space) + opt_space) * V'user',
    user = C(P'<@' * P'!' ^ -1 * R'09' ^ 1 * P'>') * space,
 }
-
-local command = opt_space * P'!docs'
+local command = opt_space * P'!docs' * (-(1 - (space + P';')))
 local query = P{
    'arg',
-   arg = opt_space * P';' + V'term' ^ -2,
-   term = opt_space * C(P(1 - (space + P';' + mention + command)) ^ 0),
+   arg = opt_space * P';' * Cc('', '') + V'term' ^ -2,
+   term = space * C(P(1 - (space + P';' + mention + command)) ^ 0) + Cc'',
 }
-
 local docs = Ct(mention ^ 0) * command * Ct(query)
 
 patterns.docs = Ct(P{
