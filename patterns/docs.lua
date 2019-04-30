@@ -25,11 +25,16 @@ local query = P{
    term = space * C(P(1 - (space + P';' + mention + command)) ^ 0) + Cc'',
 }
 local docs = Ct(mention ^ 0) * command * Ct(query)
+local backtick = -P'\\' * P'`'
+local inline_code = opt_space * backtick * (1 - backtick) ^ 0 * backtick
+local block_start = backtick * P'`' * P'`' * S'\r\n'
+local block_end = block_start
+local codeblock = block_start * (1 - block_end) * 0 * block_end
 
 patterns.docs = Ct(P{
     'message',
-    message = ((V'not_docs' * space * Ct(docs)) + Ct(docs) + (V'not_docs' * (-docs + P'!docs' * space))) ^ 1 * -1,
-    not_docs = opt_space * (1 - docs) ^ 1,
+    message = ((inline_code + codeblock + V'not_docs' * space * Ct(docs)) + Ct(docs) + (V'not_docs' * (-docs + P'!docs' * space))) ^ 1 * -1,
+    not_docs = opt_space * (1 - docs - inline_code) ^ 1,
  })
 
 return patterns
