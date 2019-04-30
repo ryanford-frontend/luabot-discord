@@ -20,15 +20,15 @@ local mention = P {
 }
 
 local command = opt_space * P'!docs'
-local query = P {
+local query = P{
    'arg',
-   arg = V'term' ^ -2,
+   arg = opt_space * P';' + V'term' ^ -2,
    term = opt_space * C(P(1 - (space + P';' + mention + command)) ^ 0),
 }
 
 local docs = Ct(mention ^ 0) * command * Ct(query)
 
-patterns.docs = Ct(P {
+patterns.docs = Ct(P{
     'message',
     message = ((V'not_docs' * space * Ct(docs)) + Ct(docs) + (V'not_docs' * (-docs + P'!docs' * space))) ^ 1 * -1,
     not_docs = opt_space * (1 - docs) ^ 1,
