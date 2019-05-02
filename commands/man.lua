@@ -4,7 +4,10 @@ local concat = table.concat
 local sf = string.format
 local unpack = table.unpack
 
-local man = {}
+local man = {
+   _SIGNATURE = '[mentions [, ...]] !man [, query]',
+   _DESCRIPTION = 'Search for Linux manpages',
+}
 local mt = {__call = function(_, message)
    local man_pattern = Pattern:new{
       name = 'man',

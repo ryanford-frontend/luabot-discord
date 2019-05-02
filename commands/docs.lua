@@ -4,7 +4,10 @@ local concat = table.concat
 local sf = string.format
 local unpack = table.unpack
 
-local docs = {}
+local docs = {
+   _SIGNATURE = '[mentions [, ...]] !docs [, query [, subquery]]',
+   _DESCRIPTION = 'Search devdocs.io for framework and programming language documentation',
+}
 local mt = {__call = function(_, message)
    local docs_pattern = Pattern:new{
       name = 'docs',
