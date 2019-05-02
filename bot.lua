@@ -5,14 +5,12 @@ local TOKEN = config.token
 local coro_wrap = coroutine.wrap
 local fs = require('coro-fs')
 local scandir = fs.scandir
-
-local commands = {}
+local commands = require('./utils/commands.lua')
 
 coro_wrap(function()
    for f in scandir('commands') do
       print('Loading ' .. f.name)
-      local command = require('./commands/' .. f.name)
-      commands[#commands + 1] = command
+      commands:add(f.name)
    end
 end)()
 
@@ -21,9 +19,7 @@ client:on('ready', function()
 end)
 
 client:on('messageCreate', function(message)
-   for _, command in ipairs(commands) do
-      command(message)
-   end
+   commands:run(message)
 end)
 
 client:run(TOKEN)
