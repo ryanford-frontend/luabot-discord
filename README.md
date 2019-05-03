@@ -41,6 +41,8 @@ Notable features include:
     
  return config
  ```
-##### 7. Run `luvit bot.lua`
+##### 7. Start the bot
+
+ `luvit bot.lua`
 
 ##### 8. You're done! :tada:
