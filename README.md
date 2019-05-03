@@ -13,34 +13,34 @@ Notable features include:
 
 ### Install Instructions
 
-1. Set up your bot on Discord
+##### 1. Set up your bot on Discord
 
-See [Discordia Wiki](https://github.com/SinisterRectus/Discordia/wiki/Setting-up-a-Discord-application) for instructions
+ See [Discordia Wiki](https://github.com/SinisterRectus/Discordia/wiki/Setting-up-a-Discord-application) for instructions
 
-2. Get Luvit/Lit
+##### 2. Get Luvit/Lit
 
-See [Luvit's Instructions](https://luvit.io/install.html) 
+ See [Luvit's Instructions](https://luvit.io/install.html) 
 
-3. Clone this repo
+##### 3. Clone this repo
 
-`git clont https://github.com/ryanford-frontend/luabot-discord.git`
+ `git clont https://github.com/ryanford-frontend/luabot-discord.git`
 
-4. Install Discordia
+##### 4. Install Discordia
 
-`cd` into the project root and run `lit install SinisterRectus/discordia`
+ `cd` into the project root and run `lit install SinisterRectus/discordia`
 
-5. Install dependencies
+##### 5. Install dependencies
 
-`lit install creationix/coro-fs`
+ `lit install creationix/coro-fs`
 
-6. Create a `config.lua` with your bot token
-```
-local config = {
-token = 'Bot YOUR_TOKEN_HERE',
-}
+##### 6. Create a `config.lua` with your bot token
+ ```
+ local config = {
+    token = 'Bot YOUR_TOKEN_HERE',
+ }
+    
+ return config
+ ```
+##### 7. Run `luvit bot.lua`
 
-return config
-```
-7. Run `luvit bot.lua`
-
-8. You're done! :tada:
+##### 8. You're done! :tada:
