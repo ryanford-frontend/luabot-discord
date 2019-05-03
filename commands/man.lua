@@ -43,7 +43,7 @@ local mt = {__call = function(self, message)
          subquery = subquery ~= '' and subquery or nil
          response = sf('%ssearch/?q=%s>', '<https://www.die.net/', urlencode(concat({ query, subquery }, '+')))
       else
-         response = sf('```text\n%s\n```', concat({ self._DESCRIPTION, self._SIGNATURE }, '\n\n'))
+         response = sf('```text\n%s\n```', concat({ 'man - ' .. self._DESCRIPTION, 'Usage: ' .. self._SIGNATURE }, '\n\n'))
       end
 
       message.channel:send(response)
