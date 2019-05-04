@@ -18,6 +18,8 @@ local mt = {__call = function(_, message, commands)
       prefix = '!',
    }
 
+   if not message.guild then return end
+
    local matches = help_pattern:match(message.content) or {}
 
    if #matches > 0 then

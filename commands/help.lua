@@ -21,7 +21,10 @@ local mt = {__call = function(_, message, commands)
    local matches = help_pattern:match(message.content) or {}
 
    for _, match in ipairs(matches) do
-      local member = message.guild:getMember(message.author)
+      local member
+      if message.guild then
+         member = message.guild:getMember(message.author)
+      end
       local mentions, queries = unpack(match)
       local query = queries[1]
       local command = commands[query .. '.lua']
@@ -31,19 +34,23 @@ local mt = {__call = function(_, message, commands)
       if not command or query == '' then
          response = response .. 'Luabot is an opensource bot written in Lua\nSee the source at https://github.com/ryanford-frontend/luabot-discord'
          for name, info in pairs(commands) do
-            local authorized = info._ROLE ~= admin_role or info._ROLE == admin_role and member:hasRole(admin_role)
-            if authorized then
-               response = response .. sf(template, name:sub(1, -5), info._DESCRIPTION, info._SIGNATURE)
+            if member or info._ROLE ~= admin_role then
+               local authorized = info._ROLE ~= admin_role or info._ROLE == admin_role and member:hasRole(admin_role)
+               if authorized then
+                  response = response .. sf(template, name:sub(1, -5), info._DESCRIPTION, info._SIGNATURE)
+               end
             end
          end
          response = response .. '\n```'
          message.channel:send(response)
       else
-         local authorized = command._ROLE ~= admin_role or command._ROLE == admin_role and member:hasRole(admin_role)
-         if authorized then
-            response = response .. sf(template, query, command._DESCRIPTION, concat({ command._SIGNATURE, command._HELP }, '\n\n'))
-            response = response .. '\n```'
-            message.channel:send(response)
+         if member or command._ROLE ~= admin_role then
+            local authorized = command._ROLE ~= admin_role or command._ROLE == admin_role and member:hasRole(admin_role)
+            if authorized then
+               response = response .. sf(template, query, command._DESCRIPTION, concat({ command._SIGNATURE, command._HELP }, '\n\n'))
+               response = response .. '\n```'
+               message.channel:send(response)
+            end
          end
       end
    end
