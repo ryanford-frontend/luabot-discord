@@ -1,3 +1,5 @@
+local discordia = require('discordia')
+local logger = logger or discordia.Logger(3, '%Y-%m-%d %H:%m:%S')
 local Pattern = require('utils/pattern')
 local urlencode = require('querystring').urlencode
 local concat = table.concat
@@ -27,6 +29,7 @@ local mt = {__call = function(_, message, commands)
       if member and member:hasRole(admin_role) then
          print(message.author.username .. ': ' .. message.content)
          message.channel:send('Shutting down...')
+         logger.log(1, message.author.username .. ': ' .. message.content)
          os.exit(0)
       end
    end
