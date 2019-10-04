@@ -23,7 +23,7 @@ Notable features include:
 
 ##### 3. Clone this repo
 
- `git clont https://github.com/ryanford-frontend/luabot-discord.git`
+ `git clone https://github.com/ryanford-frontend/luabot-discord.git`
 
 ##### 4. Install Discordia
 
