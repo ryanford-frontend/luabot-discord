@@ -6,6 +6,7 @@ local coro_wrap = coroutine.wrap
 local fs = require('coro-fs')
 local scandir = fs.scandir
 local commands = require('./utils/commands.lua')
+local logger = discordia.Logger(3, '%Y-%m-%d %H:%m:%S')
 
 coro_wrap(function()
    for f in scandir('commands') do
