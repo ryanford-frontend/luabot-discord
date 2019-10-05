@@ -26,7 +26,10 @@ local mt = {__call = function(_, message, commands)
       local member = message.guild:getMember(message.author)
       if member and member:hasRole(admin_role) then
          message.channel:send('Shutting down...')
-         error('KILLED!!!\n' .. message.author.username .. ': ' .. message.content)
+         local discordia = require('discordia')
+         local logger = discordia.Logger(3, '%Y-%m-%d %H:%m:%s', './discordia.log')
+         logger:log(1, 'KILLED!!!\t' .. message.author.username .. ': ' .. message.content)
+         os.exit(0)
       end
    end
 end}

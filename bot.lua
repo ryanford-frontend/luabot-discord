@@ -6,17 +6,17 @@ local coro_wrap = coroutine.wrap
 local fs = require('coro-fs')
 local scandir = fs.scandir
 local commands = require('./utils/commands.lua')
-local logger = discordia.Logger(3, '%Y-%m-%d %H:%m:%S')
+local logger = discordia.Logger(3, '%Y-%m-%d %H:%m:%S', './discordia.log')
 
 coro_wrap(function()
    for f in scandir('commands') do
-      print('Loading ' .. f.name)
+      logger:log(3, 'Loading ' .. f.name)
       commands:add(f.name)
    end
 end)()
 
 client:on('ready', function()
-   print('Logged in as '.. client.user.username)
+   logger:log(3, 'Logged in as '.. client.user.username)
 end)
 
 client:on('messageCreate', function(message)
