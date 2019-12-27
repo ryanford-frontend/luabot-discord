@@ -7,6 +7,7 @@ local fs = require('coro-fs')
 local scandir = fs.scandir
 local commands = require('./utils/commands.lua')
 local logger = discordia.Logger(3, '%Y-%m-%d %H:%m:%S', './discordia.log')
+local nobot = config.nobot_role
 
 coro_wrap(function()
    for f in scandir('commands') do
@@ -20,6 +21,8 @@ client:on('ready', function()
 end)
 
 client:on('messageCreate', function(message)
+	local member = message.guild:getMember(message.author)
+	if member and member:hasRole(nobot) then return end
    commands:run(message)
 end)
 
